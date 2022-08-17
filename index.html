@@ -18,31 +18,32 @@
     color: white;
     border-radius: 0.375rem;
     padding: 30px;
-    margin: 0 200px;">
+    margin: 0 16vw;">
 
         <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" aria-describedby="emailHelp" placeholder="Type here">
-            <div id="emailHelp" class="form-text">Add an item to the list.</div>
+            <label for="title" class="form-label">Task</label>
+            <input type="text" class="form-control" id="title" aria-describedby="emailHelp"
+                placeholder="Enter your task here">
+            <div id="emailHelp" class="form-text">Add a task to the list.</div>
         </div>
 
         <div class="mb-3">
             <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="description" rows="3" placeholder="Type here"></textarea>
+            <textarea class="form-control" id="description" rows="3" placeholder="Enter description here"></textarea>
         </div>
 
         <button class="btn btn-outline-info" id="add">Add to list</button>
         <button class="btn btn-outline-danger" id="clear" onclick="clearStorage()">Clear list</button>
     </div>
 
-    <div id="items" style="color: white; margin: 0 230px;">
-        <h2>Your Items</h2>
+    <div id="items" style="color: white; margin: 0 16vw;">
+        <h2>Your Tasks</h2>
         <table class="table" style="color: white;">
             <thead>
                 <tr>
                     <th scope="col">S.No.</th>
-                    <th scope="col">Item Title</th>
-                    <th scope="col">Item Description</th>
+                    <th scope="col">Task</th>
+                    <th scope="col">Description</th>
                     <th scope="col">Actions</th>
                 </tr>
             </thead>
@@ -66,23 +67,41 @@
         crossorigin="anonymous"></script>
 
     <script>
+        // if (localStorage.getItem('itemsJson') == null) {
+        //     clear.disabled = "true"
+        // }
         function getAndUpdate() {
-            console.log("Updating list...")
-            tit = document.getElementById('title').value
-            desc = document.getElementById('description').value
 
-            if (localStorage.getItem('itemsJson') == null) {
-                itemJsonArray = []
-                itemJsonArray.push([tit, desc])
-                localStorage.setItem('itemsJson', JSON.stringify(itemJsonArray))
+            if (title.value == "") {
+                alert("Please enter a task.")
+                add.blur()
             }
             else {
-                itemJsonArrayStr = localStorage.getItem('itemsJson')
-                itemJsonArray = JSON.parse(itemJsonArrayStr)
-                itemJsonArray.push([tit, desc])
-                localStorage.setItem('itemsJson', JSON.stringify(itemJsonArray))
+                console.log("Updating list...")
+                tit = document.getElementById('title').value
+                desc = document.getElementById('description').value
+
+                if (localStorage.getItem('itemsJson') == null) {
+                    itemJsonArray = []
+                    itemJsonArray.push([tit, desc])
+                    localStorage.setItem('itemsJson', JSON.stringify(itemJsonArray))
+
+                }
+                else {
+                    itemJsonArrayStr = localStorage.getItem('itemsJson')
+                    itemJsonArray = JSON.parse(itemJsonArrayStr)
+                    itemJsonArray.push([tit, desc])
+                    localStorage.setItem('itemsJson', JSON.stringify(itemJsonArray))
+
+
+                }
+                update()
+
+                title.value = ""
+                description.value = ""
+
+                add.blur()
             }
-            update()
 
         }
 
@@ -101,12 +120,26 @@
 
             itemJsonArray.forEach((element, index) => {
 
-                str += `<tr>
+
+                if (element[1] == "") {
+
+                    str += `<tr>
+                    <th scope="row">${index + 1}</th>
+                    <td>${element[0]}</td>
+                    <td>-</td>
+                    <td><button class="btn btn-outline-danger btn-sm" onclick="deleted(${index})">Delete</button></td>
+                </tr>`
+
+                }
+
+                else {
+                    str += `<tr>
                     <th scope="row">${index + 1}</th>
                     <td>${element[0]}</td>
                     <td>${element[1]}</td>
                     <td><button class="btn btn-outline-danger btn-sm" onclick="deleted(${index})">Delete</button></td>
-                </tr>`
+                </tr>`}
+
 
             });
 
@@ -125,13 +158,17 @@
             update()
         }
 
+
         function clearStorage() {
+            clear.blur()
             if (confirm("Do you really want to clear the list?")) {
                 console.log("Clearing the storage...")
                 localStorage.clear()
                 update()
+                clear.blur()
             }
         }
+
     </script>
 </body>
 
